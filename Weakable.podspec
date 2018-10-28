@@ -1,7 +1,7 @@
 Pod::Spec.new do |s|
 
   s.name                = "Weakable"
-  s.version             = "1.0.0"
+  s.version             = "1.0.1"
   s.summary             = "An easy way to hold weak references in Swift."
   s.screenshot          = "https://github.com/BellAppLab/Weakable/raw/master/Images/weakable.png"
 
