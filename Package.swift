@@ -14,7 +14,8 @@ let package = Package(
         ),
         .testTarget(
             name: "WeakableTests",
-            dependencies: ["Weakable"]),
-        ],
+            dependencies: ["Weakable"]
+        ),
+    ],
     swiftLanguageVersions: [3, 4]
 )

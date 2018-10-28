@@ -1,7 +1,7 @@
-# Weakable [![Version](https://img.shields.io/badge/Version-1.0-black.svg?style=flat)](#installation) [![License](https://img.shields.io/cocoapods/l/Weakable.svg?style=flat)](#license)
+# Weakable [![Version](https://img.shields.io/badge/Version-1.0.1-black.svg?style=flat)](#installation) [![License](https://img.shields.io/cocoapods/l/Weakable.svg?style=flat)](#license)
 
 [![Platforms](https://img.shields.io/badge/Platforms-iOS|watchOS|tvOS|macOS|Linux-brightgreen.svg?style=flat)](#installation)
-[![Swift support](https://img.shields.io/badge/Swift-3.3%20%7C%204.1-red.svg?style=flat)](#swift-versions-support)
+[![Swift support](https://img.shields.io/badge/Swift-3.3%20%7C%204.1%20%7C%204.2-red.svg?style=flat)](#swift-versions-support)
 [![CocoaPods Compatible](https://img.shields.io/cocoapods/v/Weakable.svg?style=flat&label=CocoaPods)](https://cocoapods.org/pods/Weakable)
 [![Carthage compatible](https://img.shields.io/badge/Carthage-compatible-4BC51D.svg?style=flat)](https://github.com/Carthage/Carthage)
 [![Swift Package Manager compatible](https://img.shields.io/badge/SPM-compatible-orange.svg?style=flat)](https://github.com/apple/swift-package-manager)
@@ -34,10 +34,10 @@ class TestClass {}
 var aTestObject = TestClass()
 
 //You can create a Weak like this:
-let weakTestObject = Weak(aTestObject)
+var weakTestObject = Weak(aTestObject)
 
 //Or using the shorthand operator ≈
-let anotherWeakTestObject = ≈test
+var anotherWeakTestObject = ≈test
 ```
 
 Access your variable:
@@ -58,10 +58,10 @@ weakTestObject.object //returns your value as an optional, since it may or may n
 let object = AwesomeClass()
 
 //you can create a Weak by either
-let weakObject = Weak(object)
+var weakObject = Weak(object)
 
 //or
-let weakObject = ≈object
+var weakObject = ≈object
 ```
 
 * `postfix operator ≈`
@@ -69,7 +69,7 @@ let weakObject = ≈object
   
 ```swift
 //Given a Weak
-let weakObject = ≈object
+var weakObject = ≈object
 
 //you can access the underlying object by
 weakObject.object
@@ -135,7 +135,7 @@ Then `import Weakable` where needed.
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/BellAppLab/Weakable", from: "1.0.0")
+    .package(url: "https://github.com/BellAppLab/Weakable", from: "1.0")
 ]
 ```
 

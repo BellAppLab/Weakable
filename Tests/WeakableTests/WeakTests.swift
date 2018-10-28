@@ -92,8 +92,12 @@ class WeakableTests: XCTestCase
         //TODO: fix this
         test = OtherTest()
 
-        var otherWeakTest: Weak<TestProtocol> = nil
+        var otherWeakTest: Weak<AnyObject> = nil
         otherWeakTest ≈ test
+
+        let testProtocol: TestProtocol? = otherWeakTest.as()
+
+        XCTAssertNotNil(testProtocol, "otherWeakTest unwrapped as TestProtocol should not be nil")
     }
 }
 

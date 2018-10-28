@@ -30,10 +30,21 @@ import Foundation
  ## See Also:
  - `Weak`
  */
-public protocol Weakable {
+public protocol Weaked {
     associatedtype WeakObject: AnyObject
     var object: WeakObject? { get }
 }
+
+
+public extension Weaked {
+    /**
+     Given a `Weak`, returns the underlying object if it can be converted to `T`.
+     */
+    public func `as`<T>() -> T? {
+        return object as? T
+    }
+}
+
 
 //MARK: - Main
 /**
@@ -49,7 +60,7 @@ public protocol Weakable {
  var aTestObject = TestClass()
 
  //You can create a Weak like this:
- let weakTestObject = Weak(aTestObject)
+ var weakTestObject = Weak(aTestObject)
  ```
 
  Then you can access the underlying object by:
@@ -64,10 +75,10 @@ public protocol Weakable {
  ## See Also:
  - `Operators`
  */
-public struct Weak<Object: AnyObject>: Weakable, ExpressibleByNilLiteral, CustomStringConvertible {
+public struct Weak<Object: AnyObject>: Weaked, ExpressibleByNilLiteral, CustomStringConvertible {
     public typealias WeakObject = Object
 
-    public fileprivate(set) weak var object: Object?
+    public weak var object: Object?
     
     public init(_ object: Object? = nil) {
         self.object = object
@@ -90,13 +101,13 @@ prefix operator ≈
 
  ```swift
  //Given an object
- let object = AwesomeClass()
+ var object = AwesomeClass()
 
  //you can create a Weak by either
- let weakObject = Weak(object)
+ var weakObject = Weak(object)
 
  //or
- let weakObject = ≈object
+ var weakObject = ≈object
  ```
  */
 public prefix func ≈<T: AnyObject>(rhs: T?) -> Weak<T> {
@@ -109,7 +120,7 @@ postfix operator ≈
 
  ```swift
  //Given a Weak
- let weakObject = ≈object
+ var weakObject = ≈object
 
  //you can access the underlying object by
  weakObject.object
@@ -128,7 +139,26 @@ postfix operator ≈?
 
  ```swift
  //Given a Weak
- let weakObject = ≈object
+ var weakObject = ≈object
+
+ //you can access the underlying object by
+ weakObject.object
+
+ //or
+ weakObject≈?
+ ```
+ */
+public postfix func ≈?<T: AnyObject>(lhs: Weak<T>) -> T? {
+    return lhs.object
+}
+
+postfix operator ≈??
+/**
+ Shorthand accessor to unwrap a `Weak`'s object as another type.
+
+ ```swift
+ //Given a Weak
+ var weakObject = ≈object
 
  //you can access the underlying object by
  weakObject.object
@@ -137,8 +167,8 @@ postfix operator ≈?
  weakObject≈
  ```
  */
-public postfix func ≈?<T: AnyObject>(lhs: Weak<T>) -> T? {
-    return lhs.object
+public postfix func ≈??<T>(lhs: Weak<AnyObject>) -> T? {
+    return lhs.as()
 }
 
 infix operator ≈: AssignmentPrecedence
@@ -147,7 +177,7 @@ infix operator ≈: AssignmentPrecedence
 
  ```swift
  //Given a Weak
- let weakObject = ≈object
+ var weakObject = ≈object
 
  //you can change the underlying object by
  weakObject.object = anotherObject
@@ -161,35 +191,57 @@ public func ≈<T: AnyObject>(lhs: inout Weak<T>, rhs: T?) {
 }
 
 //MARK: - Collections
-public extension Array where Element: Weakable {
+public extension Array where Element: Weaked {
     /**
      Returns a new array containing only `Weak`s whose objects aren't `nil`.
 
-   - note: This function calls `filter {}` on the array.
-           Expected time complexity: `O(n)`.
+     This function calls `filter {}` on the array.
+
+     - complexity: O(n)
      */
     public func filterWeaks() -> [Element] {
-        return filter({ $0.object != nil })
+        return filter { $0.object != nil }
     }
 
     /**
      Given an array of `Weak`s, returns a new array containing only the underlying objects that aren't `nil`.
 
-     - note: This function calls `compactMap {}` on the array.
-             Expected time complexity: `O(n)`.
+     This function calls `compactMap {}` on the array.
+
+     - complexity: O(n)
      */
     public func compactWeaks() -> [Element.WeakObject] {
-        return compactMap({ $0.object })
+        #if swift(>=4.0)
+        return compactMap { $0.object }
+        #else
+        return flatMap { $0.object }
+        #endif
     }
 
     /**
      Modifies the array in place, removing the `Weak`s whose objects are `nil`.
 
-     - note: This function calls `filterWeaks()` on the array and sets it on to `self`.
-             Expected time complexity: `O(n)`.
+     This function calls `filterWeaks()` on the array and sets it on to `self`.
+
+     - complexity: O(n)
      */
     public mutating func removeWeaks() {
         self = filterWeaks()
+    }
+
+    /**
+     Given an array whose values are `Weak`s, returns a new array containing only the underlying objects that can be converted to `T`.
+
+     This function calls `compactMap {}` on the array.
+
+     - complexity: O(n)
+     */
+    public func `as`<T>() -> [T] {
+        #if swift(>=4.0)
+        return compactMap { $0.as() }
+        #else
+        return flatMap { $0.as() }
+        #endif
     }
 }
 
@@ -197,32 +249,34 @@ public extension Array where Element: AnyObject {
     /**
      Given an array of objects, creates a new array by wrapping them in `Weak`s.
 
-     - note: This function calls `map {}` on the array.
-             Expected time complexity: `O(n)`.
+     This function calls `map {}` on the array.
+
+     - complexity: O(n)
      */
     public func asWeaks() -> [Weak<Element>] {
-        return map({ ≈$0 })
+        return map { ≈$0 }
     }
 }
 
 
-public extension Dictionary where Value: Weakable {
+public extension Dictionary where Value: Weaked {
     /**
      Given a dictionary whose values are `Weak`s, return a new dictionary containing only the `Weak`s whose objects aren't `nil`.
 
-     - note: This function calls `filter {}` on the dictionary.
-             Expected time complexity: `O(n)`.
+     This function calls `filter {}` on the dictionary.
+
+     - complexity: O(n)
      */
     public func filterWeaks() -> Dictionary<Key, Value> {
         #if swift(>=4.0)
-        return filter({ $1.object != nil })
+        return filter { $1.object != nil }
         #else
         var result = Dictionary<Key, Value>()
-        forEach({
+        forEach {
             if $1.object != nil {
                 result[$0] = $1
             }
-        })
+        }
         return result
         #endif
     }
@@ -230,21 +284,36 @@ public extension Dictionary where Value: Weakable {
     /**
      Given a dictionary whose values are `Weak`s, returns a new dictionary containing only the underlying objects that aren't `nil`.
 
-     - note: This function calls `filterWeaks().mapValues {}` on the dictionary.
-             Expected time complexity: `O(n)`.
+     This function calls `filterWeaks().mapValues {}` on the dictionary.
+
+     - complexity: O(n)
      */
     public func compactWeaks() -> Dictionary<Key, Value.WeakObject> {
-        return filterWeaks().mapValues({ $0.object! })
+        return filterWeaks().mapValues { $0.object! }
     }
 
     /**
      Modifies the dictionary in place, removing the `Weak`s whose objects are `nil`.
 
-     - note: This function calls `filterWeaks()` on the array and sets it on to `self`.
-             Expected time complexity: `O(n)`.
+     This function calls `filterWeaks()` on the dictionary and sets it on to `self`.
+
+     - complexity: O(n)
      */
     public mutating func removeWeaks() {
         self = filterWeaks()
+    }
+
+    /**
+     Given a dictionary whose values are `Weak`s, returns a new dictionary containing only the underlying objects that can be converted to `T`.
+
+     This function calls `forEach {}` on the dictionary.
+
+     - complexity: O(n)
+     */
+    public func `as`<T>() -> Dictionary<Key, T> {
+        var result = Dictionary<Key, T>()
+        forEach { result[$0] = $1.as() }
+        return result
     }
 }
 
@@ -252,11 +321,12 @@ public extension Dictionary where Value: AnyObject {
     /**
      Given a dictionary of objects, creates a new dictionary by wrapping them in `Weak`s.
 
-     - note: This function calls `mapValues {}` on the dictionary.
-             Expected time complexity: `O(n)`.
+     This function calls `mapValues {}` on the dictionary.
+     
+     - complexity: O(n)
      */
     public func asWeakValues() -> Dictionary<Key, Weak<Value>> {
-        return mapValues({ ≈$0 })
+        return mapValues { ≈$0 }
     }
 }
 
@@ -269,31 +339,31 @@ public extension Dictionary where Value: AnyObject {
  In other words, these are based upon: https://github.com/nvzqz/Weak
  */
 // Returns a Boolean value indicating whether two weak objects are equal.
-public func ==<W: Weakable>(lhs: W?, rhs: W?) -> Bool where W.WeakObject: Equatable {
+public func ==<W: Weaked>(lhs: W?, rhs: W?) -> Bool where W.WeakObject: Equatable {
     return lhs?.object == rhs?.object
 }
 
 /// Returns a Boolean value indicating whether a weak object and an optional object are equal.
-public func ==<W: Weakable>(lhs: W?, rhs: W.WeakObject?) -> Bool where W.WeakObject: Equatable {
+public func ==<W: Weaked>(lhs: W?, rhs: W.WeakObject?) -> Bool where W.WeakObject: Equatable {
     return lhs?.object == rhs
 }
 
 /// Returns a Boolean value indicating whether an optional object and a weak object are equal.
-public func ==<W: Weakable>(lhs: W.WeakObject?, rhs: W?) -> Bool where W.WeakObject: Equatable {
+public func ==<W: Weaked>(lhs: W.WeakObject?, rhs: W?) -> Bool where W.WeakObject: Equatable {
     return lhs == rhs?.object
 }
 
 // Returns a Boolean value indicating whether two weak objects are not equal.
-public func !=<W: Weakable>(lhs: W?, rhs: W?) -> Bool where W.WeakObject: Equatable {
+public func !=<W: Weaked>(lhs: W?, rhs: W?) -> Bool where W.WeakObject: Equatable {
     return lhs?.object != rhs?.object
 }
 
 /// Returns a Boolean value indicating whether a weak object and an optional object are not equal.
-public func !=<W: Weakable>(lhs: W?, rhs: W.WeakObject?) -> Bool where W.WeakObject: Equatable {
+public func !=<W: Weaked>(lhs: W?, rhs: W.WeakObject?) -> Bool where W.WeakObject: Equatable {
     return lhs?.object != rhs
 }
 
 /// Returns a Boolean value indicating whether an optional object and a weak object are not equal.
-public func != <W: Weakable>(lhs: W.WeakObject?, rhs: W?) -> Bool where W.WeakObject: Equatable {
+public func != <W: Weaked>(lhs: W.WeakObject?, rhs: W?) -> Bool where W.WeakObject: Equatable {
     return lhs != rhs?.object
 }
