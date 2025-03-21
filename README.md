@@ -1,7 +1,7 @@
 # Weakable [![Version](https://img.shields.io/badge/Version-2.0.0-black.svg?style=flat)](#installation) [![License](https://img.shields.io/cocoapods/l/Weakable.svg?style=flat)](#license)
 
 [![Platforms](https://img.shields.io/badge/Platforms-iOS|watchOS|tvOS|macOS|Linux-brightgreen.svg?style=flat)](#installation)
-[![Swift support](https://img.shields.io/badge/Swift-4.0%20%7C%205.x%20%7C%206.0-red.svg?style=flat)](#swift-versions-support)
+[![Swift support](https://img.shields.io/badge/Swift-4.x%20%7C%205.x%20%7C%206.0-red.svg?style=flat)](#swift-versions-support)
 [![Swift Package Manager compatible](https://img.shields.io/badge/SPM-compatible-orange.svg?style=flat)](https://github.com/apple/swift-package-manager)
 
 ![Weakable](./Images/weakable.png)
@@ -114,7 +114,7 @@ The variable `tests` will now be a `[TestClass]` containing only the elements th
 
 Version `2.0` introduces the concept of global weak variables. Say you want to share the same instance of a class in several places, but you want to release the global variable once all other references are destroyed. That's what a global weak is.
 
-```
+```swift
 final class TestClass: WeaklyGloballyIdentifiable {
     typealias GlobalID = Int
 
