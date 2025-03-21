@@ -32,7 +32,7 @@ class OtherTest: TestProtocol, CustomStringConvertible {
 }
 
 
-class WeakableTests: XCTestCase
+final class WeakableTests: XCTestCase, @unchecked Sendable
 {
     func testExample() {
         var test: Test? = Test()

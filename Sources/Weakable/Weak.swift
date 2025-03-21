@@ -30,17 +30,25 @@ import Foundation
  ## See Also:
  - `Weak`
  */
-public protocol Weaked {
+public protocol Weaked<WeakObject> {
     associatedtype WeakObject: AnyObject
     var object: WeakObject? { get }
 }
 
-
 public extension Weaked {
+    /// Returns `true` if the referenced object has been released.
+    @inline(__always)
+    var isEmpty: Bool { object == nil }
+
+    /// Same as `object`.
+    @inline(__always)
+    var value: WeakObject? { object }
+
     /**
      Given a `Weak`, returns the underlying object if it can be converted to `T`.
      */
-    public func `as`<T>() -> T? {
+    @inline(__always)
+    func `as`<T>() -> T? {
         return object as? T
     }
 }
@@ -110,8 +118,19 @@ prefix operator ≈
  var weakObject = ≈object
  ```
  */
+@inline(__always)
 public prefix func ≈<T: AnyObject>(rhs: T?) -> Weak<T> {
     return Weak(rhs)
+}
+
+@inline(__always)
+public prefix func ≈<T: AnyObject, S: Sequence>(rhs: S) -> [Weak<T>] where S.Element == T {
+    return rhs.asWeaks()
+}
+
+@inline(__always)
+public prefix func ≈<T: AnyObject, K: Hashable>(rhs: [K: T]) -> [K: Weak<T>] {
+    return rhs.asWeakValues()
 }
 
 postfix operator ≈
@@ -129,6 +148,7 @@ postfix operator ≈
  weakObject≈
  ```
  */
+@inline(__always)
 public postfix func ≈<T: AnyObject>(lhs: Weak<T>) -> Optional<T> {
     return lhs.object
 }
@@ -148,6 +168,7 @@ postfix operator ≈?
  weakObject≈?
  ```
  */
+@inline(__always)
 public postfix func ≈?<T: AnyObject>(lhs: Weak<T>) -> T? {
     return lhs.object
 }
@@ -167,6 +188,7 @@ postfix operator ≈??
  weakObject≈
  ```
  */
+@inline(__always)
 public postfix func ≈??<T>(lhs: Weak<AnyObject>) -> T? {
     return lhs.as()
 }
@@ -186,6 +208,7 @@ infix operator ≈: AssignmentPrecedence
  weakObject ≈ anotherObject
  ```
  */
+@inline(__always)
 public func ≈<T: AnyObject>(lhs: inout Weak<T>, rhs: T?) {
     lhs = Weak(rhs)
 }
@@ -199,7 +222,8 @@ public extension Array where Element: Weaked {
 
      - complexity: O(n)
      */
-    public func filterWeaks() -> [Element] {
+    @inline(__always)
+    func filterWeaks() -> [Element] {
         return filter { $0.object != nil }
     }
 
@@ -210,7 +234,8 @@ public extension Array where Element: Weaked {
 
      - complexity: O(n)
      */
-    public func compactWeaks() -> [Element.WeakObject] {
+    @inline(__always)
+    func compactWeaks() -> [Element.WeakObject] {
         #if swift(>=4.0)
         return compactMap { $0.object }
         #else
@@ -225,7 +250,8 @@ public extension Array where Element: Weaked {
 
      - complexity: O(n)
      */
-    public mutating func removeWeaks() {
+    @inline(__always)
+    mutating func removeWeaks() {
         self = filterWeaks()
     }
 
@@ -236,7 +262,8 @@ public extension Array where Element: Weaked {
 
      - complexity: O(n)
      */
-    public func `as`<T>() -> [T] {
+    @inline(__always)
+    func `as`<T>() -> [T] {
         #if swift(>=4.0)
         return compactMap { $0.as() }
         #else
@@ -245,7 +272,7 @@ public extension Array where Element: Weaked {
     }
 }
 
-public extension Array where Element: AnyObject {
+public extension Sequence where Element: AnyObject {
     /**
      Given an array of objects, creates a new array by wrapping them in `Weak`s.
 
@@ -253,7 +280,8 @@ public extension Array where Element: AnyObject {
 
      - complexity: O(n)
      */
-    public func asWeaks() -> [Weak<Element>] {
+    @inline(__always)
+    func asWeaks() -> [Weak<Element>] {
         return map { ≈$0 }
     }
 }
@@ -267,7 +295,8 @@ public extension Dictionary where Value: Weaked {
 
      - complexity: O(n)
      */
-    public func filterWeaks() -> Dictionary<Key, Value> {
+    @inline(__always)
+    func filterWeaks() -> Dictionary<Key, Value> {
         #if swift(>=4.0)
         return filter { $1.object != nil }
         #else
@@ -288,7 +317,8 @@ public extension Dictionary where Value: Weaked {
 
      - complexity: O(n)
      */
-    public func compactWeaks() -> Dictionary<Key, Value.WeakObject> {
+    @inline(__always)
+    func compactWeaks() -> Dictionary<Key, Value.WeakObject> {
         return filterWeaks().mapValues { $0.object! }
     }
 
@@ -299,7 +329,8 @@ public extension Dictionary where Value: Weaked {
 
      - complexity: O(n)
      */
-    public mutating func removeWeaks() {
+    @inline(__always)
+    mutating func removeWeaks() {
         self = filterWeaks()
     }
 
@@ -310,7 +341,8 @@ public extension Dictionary where Value: Weaked {
 
      - complexity: O(n)
      */
-    public func `as`<T>() -> Dictionary<Key, T> {
+    @inline(__always)
+    func `as`<T>() -> Dictionary<Key, T> {
         var result = Dictionary<Key, T>()
         forEach { result[$0] = $1.as() }
         return result
@@ -325,7 +357,8 @@ public extension Dictionary where Value: AnyObject {
      
      - complexity: O(n)
      */
-    public func asWeakValues() -> Dictionary<Key, Weak<Value>> {
+    @inline(__always)
+    func asWeakValues() -> Dictionary<Key, Weak<Value>> {
         return mapValues { ≈$0 }
     }
 }
@@ -339,31 +372,37 @@ public extension Dictionary where Value: AnyObject {
  In other words, these are based upon: https://github.com/nvzqz/Weak
  */
 // Returns a Boolean value indicating whether two weak objects are equal.
+@inline(__always)
 public func ==<W: Weaked>(lhs: W?, rhs: W?) -> Bool where W.WeakObject: Equatable {
     return lhs?.object == rhs?.object
 }
 
 /// Returns a Boolean value indicating whether a weak object and an optional object are equal.
+@inline(__always)
 public func ==<W: Weaked>(lhs: W?, rhs: W.WeakObject?) -> Bool where W.WeakObject: Equatable {
     return lhs?.object == rhs
 }
 
 /// Returns a Boolean value indicating whether an optional object and a weak object are equal.
+@inline(__always)
 public func ==<W: Weaked>(lhs: W.WeakObject?, rhs: W?) -> Bool where W.WeakObject: Equatable {
     return lhs == rhs?.object
 }
 
-// Returns a Boolean value indicating whether two weak objects are not equal.
+/// Returns a Boolean value indicating whether two weak objects are not equal.
+@inline(__always)
 public func !=<W: Weaked>(lhs: W?, rhs: W?) -> Bool where W.WeakObject: Equatable {
     return lhs?.object != rhs?.object
 }
 
 /// Returns a Boolean value indicating whether a weak object and an optional object are not equal.
+@inline(__always)
 public func !=<W: Weaked>(lhs: W?, rhs: W.WeakObject?) -> Bool where W.WeakObject: Equatable {
     return lhs?.object != rhs
 }
 
 /// Returns a Boolean value indicating whether an optional object and a weak object are not equal.
-public func != <W: Weaked>(lhs: W.WeakObject?, rhs: W?) -> Bool where W.WeakObject: Equatable {
+@inline(__always)
+public func !=<W: Weaked>(lhs: W.WeakObject?, rhs: W?) -> Bool where W.WeakObject: Equatable {
     return lhs != rhs?.object
 }
