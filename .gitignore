@@ -1,24 +1,8 @@
-# Created by https://www.gitignore.io/api/swift,xcode,macos,carthage,cocoapods,swiftpackagemanager
 
-### Carthage ###
-# Carthage
-#
-# Add this line if you want to avoid checking in source code from Carthage dependencies.
-# Carthage/Checkouts
-
-Carthage/Build
-
-### CocoaPods ###
-## CocoaPods GitIgnore Template
-
-# CocoaPods - Only use to conserve bandwidth / Save time on Pushing
-#           - Also handy if you have a large number of dependant pods
-#           - AS PER https://guides.cocoapods.org/using/using-cocoapods.html NEVER IGNORE THE LOCK FILE
-Pods/
+# Created by https://www.gitignore.io/api/xcode,macos,swift
 
 ### macOS ###
-# General
-.DS_Store
+*.DS_Store
 .AppleDouble
 .LSOverride
 
@@ -84,25 +68,17 @@ playground.xcworkspace
 # Add this line if you want to avoid checking in source code from Swift Package Manager dependencies.
 # Packages/
 # Package.pins
-# Package.resolved
 .build/
 
-# CocoaPods
-#
-# We recommend against adding the Pods directory to your .gitignore. However
-# you should judge for yourself, the pros and cons are mentioned at:
-# https://guides.cocoapods.org/using/using-cocoapods.html#should-i-check-the-pods-directory-into-source-control
-#
-# Pods/
-#
-# Add this line if you want to avoid checking in source code from the Xcode workspace
-# *.xcworkspace
+### CocoaPods ###
+## CocoaPods GitIgnore Template
 
-# Carthage
-#
-# Add this line if you want to avoid checking in source code from Carthage dependencies.
-# Carthage/Checkouts
+# CocoaPods - Only use to conserve bandwidth / Save time on Pushing
+#           - Also handy if you have a large number of dependant pods
+#           - AS PER https://guides.cocoapods.org/using/using-cocoapods.html NEVER IGNORE THE LOCK FILE
+Pods/
 
+# Carthage - Refactored to standalone file
 
 # fastlane
 #
@@ -113,24 +89,19 @@ playground.xcworkspace
 
 fastlane/report.xml
 fastlane/Preview.html
-fastlane/screenshots/**/*.png
+fastlane/screenshots
 fastlane/test_output
-
-### SwiftPackageManager ###
-Packages
-xcuserdata
-*.xcodeproj
 
 ### Xcode ###
 # Xcode
 #
 # gitignore contributors: remember to update Global/Xcode.gitignore, Objective-C.gitignore & Swift.gitignore
 
-## User settings
+## Build generated
 
-## compatibility with Xcode 8 and earlier (ignoring not required starting Xcode 9)
+## Various settings
 
-## compatibility with Xcode 3 and earlier (ignoring not required starting Xcode 4)
+## Other
 
 ### Xcode Patch ###
 *.xcodeproj/*
@@ -140,4 +111,6 @@ xcuserdata
 /*.gcno
 
 
-# End of https://www.gitignore.io/api/swift,xcode,macos,carthage,cocoapods,swiftpackagemanager
+# End of https://www.gitignore.io/api/xcode,macos,swift
+
+.swiftpm

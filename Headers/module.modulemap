@@ -1,6 +1,0 @@
-framework module Weakable {
-    umbrella header "Weakable.h"
-    
-    export *
-    module * { export * }
-}

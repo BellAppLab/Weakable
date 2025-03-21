@@ -1,13 +1,15 @@
-// swift-tools-version:4.1
+// swift-tools-version: 6.0
 
 import PackageDescription
 
 let package = Package(
     name: "Weakable",
+    platforms: [.macOS(.v11), .iOS(.v12), .tvOS(.v12), .watchOS(.v4)],
     products: [
-        .library(name: "Weakable",
-                 targets: ["Weakable"]),
-        ],
+        .library(
+            name: "Weakable",
+            targets: ["Weakable"])
+    ],
     targets: [
         .target(
             name: "Weakable"
@@ -17,5 +19,9 @@ let package = Package(
             dependencies: ["Weakable"]
         ),
     ],
-    swiftLanguageVersions: [3, 4]
+    swiftLanguageModes: [
+        .v4,
+        .v5,
+        .v6
+    ]
 )

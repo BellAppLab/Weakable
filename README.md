@@ -1,11 +1,8 @@
-# Weakable [![Version](https://img.shields.io/badge/Version-1.0.1-black.svg?style=flat)](#installation) [![License](https://img.shields.io/cocoapods/l/Weakable.svg?style=flat)](#license)
+# Weakable [![Version](https://img.shields.io/badge/Version-2.0.0-black.svg?style=flat)](#installation) [![License](https://img.shields.io/cocoapods/l/Weakable.svg?style=flat)](#license)
 
 [![Platforms](https://img.shields.io/badge/Platforms-iOS|watchOS|tvOS|macOS|Linux-brightgreen.svg?style=flat)](#installation)
-[![Swift support](https://img.shields.io/badge/Swift-3.3%20%7C%204.1%20%7C%204.2-red.svg?style=flat)](#swift-versions-support)
-[![CocoaPods Compatible](https://img.shields.io/cocoapods/v/Weakable.svg?style=flat&label=CocoaPods)](https://cocoapods.org/pods/Weakable)
-[![Carthage compatible](https://img.shields.io/badge/Carthage-compatible-4BC51D.svg?style=flat)](https://github.com/Carthage/Carthage)
+[![Swift support](https://img.shields.io/badge/Swift-4.0%20%7C%205.x%20%7C%206.0-red.svg?style=flat)](#swift-versions-support)
 [![Swift Package Manager compatible](https://img.shields.io/badge/SPM-compatible-orange.svg?style=flat)](https://github.com/apple/swift-package-manager)
-[![Twitter](https://img.shields.io/badge/Twitter-@BellAppLab-blue.svg?style=flat)](http://twitter.com/BellAppLab)
 
 ![Weakable](./Images/weakable.png)
 
@@ -17,11 +14,11 @@ With Weakable you can create weak arrays, weak dictionaries and many other cool 
 
 ## Requirements
 
-* iOS 9+
-* watchOS 3+
-* tvOS 9+
-* macOS 10.11+
-* Swift 3.3+
+* iOS 12+
+* watchOS 4+
+* tvOS 12+
+* macOS 11+
+* Swift 4+
 
 ## Usage
 
@@ -98,7 +95,7 @@ You can safely store your `Weak` variables in collections (eg. `[Weak<TestClass>
 
 ```swift
 var tests = (1...10).map { TestClass() } // 10 elements
-var weakTests = tests.map { ≈$0 } // 10 elements
+var weakTests = ≈tests // 10 elements
 
 tests.removeLast() // `tests` now have 9 elements, but `weakTests` have 10
 
@@ -113,9 +110,41 @@ let tests = weakTests.compactWeaks()
 
 The variable `tests` will now be a `[TestClass]` containing only the elements that haven't been released yet.
 
+## Global weaks
+
+Version `2.0` introduces the concept of global weak variables. Say you want to share the same instance of a class in several places, but you want to release the global variable once all other references are destroyed. That's what a global weak is.
+
+```
+final class TestClass: WeaklyGloballyIdentifiable {
+    typealias GlobalID = Int
+
+    @WeakGlobalActor
+    static var weakGlobals: [GlobalID: Weak<TestClass>] = [:]
+}
+
+let firstInstance = TestClass.weakGlobal(id: 1, default: TestClass())
+let secondInstance = TestClass.weakGlobal(id: 1, default: TestClass())
+
+print(firstInstance === secondInstance) // `true`
+```
+
 ## Installation
 
-### Cocoapods
+### Swift Package Manager
+
+```swift
+dependencies: [
+    .package(url: "https://github.com/BellAppLab/Weakable", from: "2.0")
+]
+```
+
+Then `import Weakable` where needed.
+
+### Legacy
+
+The following import methods only work for version `1.0.1`. 
+
+#### Cocoapods
 
 ```ruby
 pod 'Weakable', '~> 1.0'
@@ -123,7 +152,7 @@ pod 'Weakable', '~> 1.0'
 
 Then `import Weakable` where needed.
 
-### Carthage
+#### Carthage
 
 ```swift
 github "BellAppLab/Weakable" ~> 1.0
@@ -131,17 +160,7 @@ github "BellAppLab/Weakable" ~> 1.0
 
 Then `import Weakable` where needed.
 
-### Swift Package Manager
-
-```swift
-dependencies: [
-    .package(url: "https://github.com/BellAppLab/Weakable", from: "1.0")
-]
-```
-
-Then `import Weakable` where needed.
-
-### Git Submodules
+#### Git Submodules
 
 ```
 cd toYourProjectsFolder
