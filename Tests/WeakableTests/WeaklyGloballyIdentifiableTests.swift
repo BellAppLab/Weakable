@@ -42,8 +42,7 @@ final class GloballyIdentifiableTests: XCTestCase {
 
     @WeakGlobalActor
     func testThatWeaklyGloballyIdentifiableObjectsAreReleased() async {
-        var id = 0
-        var testObject1: TestObject? = await .weakGlobal(id: id, default: .init(id: id))
+        var testObject1: TestObject? = await .weakGlobal(id: 0, default: .init(id: 0))
 
         // The weakGlobals dictionary should contain one element while the
         // testObject1 variable is not nil
@@ -52,7 +51,7 @@ final class GloballyIdentifiableTests: XCTestCase {
         XCTAssertNotNil(testObject1)
         XCTAssertEqual(TestObject.weakGlobals.first?.value.value as? TestObject, testObject1)
 
-        var testObject2: TestObject? = await .weakGlobal(id: id, default: .init(id: id))
+        var testObject2: TestObject? = await .weakGlobal(id: 0, default: .init(id: 0))
 
         // Trying to create another test object using the same id as an existing
         // weak global should return the same object as before
@@ -63,8 +62,7 @@ final class GloballyIdentifiableTests: XCTestCase {
         XCTAssertTrue(testObject1 === testObject2)
 
         // Creating a second object
-        id = 1
-        testObject2 = await .weakGlobal(id: id, default: .init(id: id))
+        testObject2 = await .weakGlobal(id: 1, default: .init(id: 1))
 
         XCTAssertEqual(TestObject.weakGlobals.count, 2, "\(TestObject.weakGlobals)")
         XCTAssertNotNil(testObject2)
@@ -73,7 +71,7 @@ final class GloballyIdentifiableTests: XCTestCase {
 
         // Deleting objects
         testObject1 = nil
-        testObject2 = await .weakGlobal(id: id, default: .init(id: id))
+        testObject2 = await .weakGlobal(id: 1, default: .init(id: 1))
         // The weakGlobals dictionary has been flattened
         XCTAssertEqual(TestObject.weakGlobals.count, 1, "\(TestObject.weakGlobals)")
         XCTAssertEqual(TestObject.weakGlobals.first?.value.value as? TestObject, testObject2)

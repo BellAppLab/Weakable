@@ -50,7 +50,7 @@ public extension WeaklyGloballyIdentifiable {
 
     @inline(__always)
     @WeakGlobalActor
-    static func weakGlobal(id: GlobalID, default defaultValue: @autoclosure () throws -> Self) async rethrows -> Self {
+    static func weakGlobal(id: GlobalID, default defaultValue: @autoclosure @Sendable () throws -> Self) async rethrows -> Self {
         weakGlobals.removeWeaks()
         let result = try weakGlobals[id]?.value as? Self ?? defaultValue()
         weakGlobals[id] = ≈result
@@ -64,7 +64,7 @@ public extension WeaklyGloballyIdentifiable where Self: UniqueGlobalIDProvider {
 
     @inline(__always)
     @WeakGlobalActor
-    static func weakGlobal(default defaultValue: @autoclosure () throws -> Self) async rethrows -> Self {
+    static func weakGlobal(default defaultValue: @autoclosure @Sendable () throws -> Self) async rethrows -> Self {
         weakGlobals.removeWeaks()
         let result = try weakGlobals[uniqueGlobalId]?.value as? Self ?? defaultValue()
         weakGlobals[uniqueGlobalId] = ≈result
