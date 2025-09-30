@@ -42,7 +42,7 @@ final class GloballyIdentifiableTests: XCTestCase {
 
     @WeakGlobalActor
     func testThatWeaklyGloballyIdentifiableObjectsAreReleased() async {
-        var id: Int = 0
+        var id = 0
         var testObject1: TestObject? = await .weakGlobal(id: id, default: .init(id: id))
 
         // The weakGlobals dictionary should contain one element while the
@@ -90,7 +90,7 @@ final class GloballyIdentifiableTests: XCTestCase {
         XCTAssertNotNil(testObject1)
         XCTAssertEqual(TestUniqueObject.weakGlobals.first?.value.value as? TestUniqueObject, testObject1)
 
-        var testObject2: TestUniqueObject? = await .weakGlobal(id: 1, default: .init())
+        var testObject2: TestUniqueObject? = await .weakGlobal(id: 0, default: .init())
 
         // Trying to create another test object using the same id as an existing
         // weak global should return the same object as before
